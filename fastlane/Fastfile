@@ -1,0 +1,123 @@
+# Fastfile for dotdot iOS
+
+default_platform(:ios)
+
+platform :ios do
+  desc "Run tests"
+  lane :test do
+    run_tests(
+      project: "dotdot.xcodeproj",
+      scheme: "dotdot",
+      devices: ["iPhone 15"],
+      clean: true
+    )
+  end
+
+  desc "Build the app"
+  lane :build do
+    build_app(
+      project: "dotdot.xcodeproj",
+      scheme: "dotdot",
+      export_method: "app-store",
+      output_directory: "./build",
+      output_name: "dotdot.ipa",
+      clean: true
+    )
+  end
+
+  desc "Deploy to TestFlight"
+  lane :deploy_testflight do |options|
+    # Ensure we're on a clean state
+    ensure_git_status_clean
+
+    # Get the latest changes
+    git_pull
+
+    # Increment build number (handled by GitHub Actions)
+    # increment_build_number
+
+    # Build the app
+    build_app(
+      project: "dotdot.xcodeproj",
+      scheme: "dotdot",
+      export_method: "app-store",
+      output_directory: "./build",
+      output_name: "dotdot.ipa",
+      clean: true,
+      include_bitcode: false,
+      export_options: {
+        provisioningProfiles: {
+          "com.shape.dotdot" => "match AppStore com.shape.dotdot"
+        }
+      }
+    )
+
+    # Upload to TestFlight
+    upload_to_testflight(
+      api_key_path: "~/.appstoreconnect/private_keys/AuthKey_#{ENV['APP_STORE_CONNECT_KEY_ID']}.p8",
+      skip_waiting_for_build_processing: true,
+      distribute_external: options[:release_type] == "external",
+      notify_external_testers: options[:release_type] == "external",
+      changelog: last_git_commit[:message]
+    )
+
+    # Tag the release
+    add_git_tag(
+      tag: "testflight/#{get_version_number}/#{get_build_number}"
+    )
+    push_git_tags
+  end
+
+  desc "Setup code signing with Match"
+  lane :setup_signing do
+    match(
+      type: "appstore",
+      app_identifier: "com.shape.dotdot",
+      readonly: true
+    )
+  end
+
+  desc "Register new devices"
+  lane :register_devices do
+    register_devices(
+      devices_file: "./fastlane/devices.txt"
+    )
+  end
+
+  desc "Run SwiftLint"
+  lane :lint do
+    swiftlint(
+      mode: :lint,
+      strict: true,
+      raise_if_swiftlint_error: true
+    )
+  end
+
+  desc "Prepare for release"
+  lane :prepare_release do |options|
+    ensure_git_status_clean
+
+    version = options[:version]
+    if version.nil?
+      UI.user_error!("Please provide a version number using version:x.x.x")
+    end
+
+    # Update version number
+    increment_version_number(version_number: version)
+
+    # Commit version bump
+    commit_version_bump(
+      message: "Bump version to #{version}",
+      xcodeproj: "dotdot.xcodeproj"
+    )
+
+    # Create release branch
+    sh("git checkout -b release/#{version}")
+    push_to_git_remote
+  end
+
+  # Error handling
+  error do |lane, exception|
+    UI.error("Error in lane #{lane}: #{exception.message}")
+  end
+end

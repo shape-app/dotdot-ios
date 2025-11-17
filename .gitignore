@@ -60,3 +60,22 @@ fastlane/report.xml
 fastlane/Preview.html
 fastlane/screenshots/**/*.png
 fastlane/test_output
+fastlane/README.md
+
+# Sensitive files
+*.p12
+*.p8
+*.cer
+*.mobileprovision
+*.certSigningRequest
+
+# Bundler
+.bundle/
+vendor/bundle/
+
+# Build artifacts
+build/
+DerivedData/
+
+# CI/CD
+.github/workflows/.env
