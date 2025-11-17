@@ -1,0 +1,23 @@
+// Release Configuration
+
+// App Bundle Identifier
+PRODUCT_BUNDLE_IDENTIFIER = com.shape.dotdot
+
+// Display Name
+PRODUCT_NAME = dotdot
+
+// Code Signing
+CODE_SIGN_IDENTITY = Apple Distribution
+
+// Swift Compilation
+SWIFT_OPTIMIZATION_LEVEL = -O
+
+// Enable Bitcode
+ENABLE_BITCODE = NO
+
+// Strip Debug Symbols
+STRIP_INSTALLED_PRODUCT = YES
+COPY_PHASE_STRIP = YES
+
+// API Configuration (will be used when backend is integrated)
+API_BASE_URL = https:/$()/api.dotdot.app
