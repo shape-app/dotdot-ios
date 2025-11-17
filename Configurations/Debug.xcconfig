@@ -1,0 +1,23 @@
+// Debug Configuration
+
+// App Bundle Identifier
+PRODUCT_BUNDLE_IDENTIFIER = com.shape.dotdot.debug
+
+// Display Name
+PRODUCT_NAME = dotdot Debug
+
+// Code Signing
+CODE_SIGN_IDENTITY = Apple Development
+
+// Swift Compilation
+SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG
+SWIFT_OPTIMIZATION_LEVEL = -Onone
+
+// Other Swift Flags
+OTHER_SWIFT_FLAGS = -D DEBUG
+
+// Enable Testability
+ENABLE_TESTABILITY = YES
+
+// API Configuration (will be used when backend is integrated)
+API_BASE_URL = https:/$()/dev.api.dotdot.app
