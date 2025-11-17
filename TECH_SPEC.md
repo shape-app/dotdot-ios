@@ -1,24 +1,24 @@
 # dotdot iOS - Technical Specification
 
-**Version:** 1.0
-**Date:** November 2025
+**Date:** November 17, 2025
 **Status:** Draft for Review
 
 ## 1. Project Overview
 
-dotdot is a native iOS application that helps users track movies and TV shows they've watched. Users can rate content, add notes, mark items as currently watching, and maintain a personal viewing history.
+dotdot is a native iOS application that helps users track movies and TV shows they've watched and enjoyed. Users can rate their favorites, add personal notes, mark items as currently watching, and maintain a personal viewing history organized by year.
 
 ### 1.1 Core Features
 
 - User authentication (email/password)
-- Dashboard view with all watched entries
+- Dashboard view with entries grouped by year (2025, 2024, etc.)
 - Add/Edit/Delete watched entries
-- Rating system (1-3 dots: bad, okay, excellent)
+- Rating system (1-3 dots: good, great, excellent)
 - Mark items as "currently watching"
 - Add personal notes to entries
-- Filter and sort entries
+- Search entries by title
+- Rewatch detection with links to previous viewing history
 - Offline support with local persistence
-- Cloud sync across devices
+- Cloud sync across devices (optional for V1)
 
 ### 1.2 Target Platform
 
@@ -82,17 +82,29 @@ dotdot/
 ```swift
 struct WatchedEntry: Identifiable, Codable {
     let id: String
-    let userId: String
+    var userId: String?           // Optional for V1, populated during backend sync
     let title: String
     let type: EntryType
-    var rating: Int?              // 1-3 (bad, okay, excellent)
-    let watchedDate: Date
+    var rating: Int?              // 1-3 (good, great, excellent)
     var notes: String?
     var watching: Bool            // Currently watching flag
     let createdAt: Date
     var updatedAt: Date
+
+    // Computed property for year grouping
+    var year: Int {
+        Calendar.current.component(.year, from: createdAt)
+    }
 }
 ```
+
+**Design Notes:**
+- Each entry represents a viewing experience, tracked by when it was added to the list
+- Year grouping uses `createdAt` date (when user added the entry)
+- If a user rewatches content in a different year, it becomes a new entry
+- The system detects rewatches by querying for entries with the same title
+- Entries are grouped by year in the dashboard (e.g., "2025", "2024")
+- Related entries (same title, different years) are linked in the detail view
 
 #### EntryType
 ```swift
@@ -123,10 +135,21 @@ struct User: Identifiable, Codable {
 **WatchedEntry validation:**
 - Title: Required, max 200 characters
 - Type: Required (movie or tv_show)
-- Rating: Optional when `watching = true`, required otherwise (1-3)
-- Watched Date: Required, cannot be in the future
+- Rating: Optional when `watching = true`, required otherwise (1-3: good, great, excellent)
 - Notes: Optional, max 1000 characters
 - Watching: Boolean, defaults to false
+
+### 3.3 Rewatch Detection
+
+When adding a new entry:
+1. As user types the title, query existing entries (case-insensitive search)
+2. If matches found, display inline: "You watched [Title] in 2013, 2025" with links
+3. User can click to view previous entries or continue adding new entry
+
+On entry detail view:
+- Display "Watch History" section if related entries exist
+- Show: "You also watched this in [2013](link), [2025](link)"
+- Links navigate directly to the related entry
 
 ## 4. Design System
 
@@ -161,11 +184,11 @@ Using SF Pro (iOS system font) with the following scale:
 #### Reusable UI Components
 - `DotButton` - Primary, secondary, destructive variants
 - `DotCard` - Container for entry items
-- `RatingPicker` - 1-3 dot selector
-- `DotTextField` - Styled text input
+- `RatingPicker` - 1-3 dot selector (good, great, excellent)
+- `DotTextField` - Styled text input with rewatch detection
 - `DotTextEditor` - Multi-line text input
-- `DotDatePicker` - Date selection
 - `EntryTypePicker` - Movie/TV show selector
+- `SearchBar` - Search entries by title
 
 ### 4.4 Spacing System
 
@@ -238,12 +261,13 @@ Based on 8pt grid:
 ### Phase 3: Dashboard & List Views
 **Duration:** Week 2-3
 
-- Build Dashboard screen UI
+- Build Dashboard screen UI with year-based grouping
 - Create EntryListView component
 - Implement EntryCardView
-- Build EntryDetailView
+- Build EntryDetailView with watch history links
 - Create mock data for testing
-- Implement list filtering and sorting
+- Implement search functionality by title
+- Add rewatch detection UI
 
 ### Phase 4: CRUD Operations
 **Duration:** Week 3-4
@@ -263,16 +287,7 @@ Based on 8pt grid:
 - UI tests for critical user flows
 - Test coverage target: 70%+
 
-### Phase 6: CI/CD Pipeline
-**Duration:** Week 4-5
-
-- Set up GitHub Actions workflow
-- Automated build on PR
-- Automated test execution
-- TestFlight deployment automation
-- Configure build versioning
-
-### Phase 7: Landing & Authentication
+### Phase 6: Landing & Authentication
 **Duration:** Week 5-6
 
 - Build landing/onboarding screens
@@ -282,7 +297,7 @@ Based on 8pt grid:
 - Add password requirements
 - Build forgot password flow
 
-### Phase 8: Polish & Refinements
+### Phase 7: Polish & Refinements
 **Duration:** Week 6-7
 
 - Add animations and transitions
@@ -292,17 +307,17 @@ Based on 8pt grid:
 - Empty states and loading indicators
 - Dark mode support (if not already)
 
-### Phase 9: Backend Integration
+### Phase 8: Backend Integration
 **Duration:** Week 7-8
 
 - Integrate Supabase Swift SDK
 - Implement authentication with Supabase Auth
-- Set up real-time sync
+- Set up real-time sync (optional for V1)
 - Migrate from local-only to sync model
 - Handle conflict resolution
 - Add retry and error handling
 
-### Phase 10: App Store Preparation
+### Phase 9: App Store Preparation
 **Duration:** Week 9
 
 - App Store screenshots
@@ -336,10 +351,11 @@ Based on 8pt grid:
 
 **Critical User Flows:**
 - Sign up → Login → Dashboard
-- Add entry → View entry → Edit entry → Delete entry
+- Add entry with rewatch detection → View entry → Edit entry → Delete entry
 - Rating an entry
 - Marking as watching
-- Filtering and sorting
+- Searching entries
+- Viewing watch history across years
 
 ### 7.3 Test Coverage Goals
 
@@ -410,13 +426,14 @@ id: uuid (primary key)
 user_id: uuid (foreign key to auth.users)
 title: text (max 200 chars)
 type: text (enum: 'movie', 'tv_show')
-rating: int (nullable, 1-3)
-watched_date: date
+rating: int (nullable, 1-3: good, great, excellent)
 notes: text (nullable, max 1000 chars)
 watching: boolean (default false)
-created_at: timestamptz
+created_at: timestamptz (used for year grouping)
 updated_at: timestamptz
 ```
+
+**Note:** Entries are grouped by the year of `created_at` in the dashboard. No separate `watched_date` field is needed.
 
 ### 9.3 Sync Strategy
 
@@ -523,16 +540,15 @@ updated_at: timestamptz
 
 | Phase | Duration | Status |
 |-------|----------|--------|
-| Phase 1: Foundation | Week 1 | In Progress |
+| Phase 1: Foundation + CI/CD | Week 1 | Completed ✅ |
 | Phase 2: Core Architecture | Week 1-2 | Pending |
 | Phase 3: Dashboard | Week 2-3 | Pending |
 | Phase 4: CRUD Operations | Week 3-4 | Pending |
 | Phase 5: Testing | Week 4 | Pending |
-| Phase 6: CI/CD | Week 4-5 | Pending |
-| Phase 7: Authentication | Week 5-6 | Pending |
-| Phase 8: Polish | Week 6-7 | Pending |
-| Phase 9: Backend Integration | Week 7-8 | Pending |
-| Phase 10: App Store Prep | Week 9 | Pending |
+| Phase 6: Authentication | Week 5-6 | Pending |
+| Phase 7: Polish | Week 6-7 | Pending |
+| Phase 8: Backend Integration | Week 7-8 | Pending |
+| Phase 9: App Store Prep | Week 9 | Pending |
 
 **Total Estimated Timeline:** 9 weeks to App Store submission
 
@@ -562,27 +578,18 @@ updated_at: timestamptz
 | Apple guideline changes | Medium | Monitor App Store guidelines throughout |
 | Code signing issues | Medium | Set up early, document process clearly |
 
-## 18. Open Questions
+## 18. Scope Decisions
 
-1. Do we need iPad-specific layouts, or is iPhone layout scaled up acceptable?
-2. Should we support social features (sharing, friends) in v1?
-3. Do we want to integrate with external APIs (TMDB, IMDB) for movie/show metadata?
-4. Should users be able to export their data (CSV, JSON)?
-5. Do we need push notifications for any features?
+**V1 (MVP) Scope:**
+- ✅ iPad support with optimized layouts
+- ✅ Year-based entry grouping with rewatch detection
+- ✅ Search functionality
+- ✅ Local-first offline support
+- ✅ Optional cloud sync
 
-## 19. Approval & Sign-off
+**V2 (Future) Features:**
+- Social features (sharing, friends)
+- External API integration (TMDB, IMDB) for metadata
+- Data export (CSV, JSON)
+- Push notifications
 
-This technical specification requires review and approval before Phase 2 execution begins.
-
-**Reviewers:**
-- [ ] Engineering Lead
-- [ ] Product Owner
-- [ ] Design Lead
-- [ ] QA Lead
-
-**Approval Date:** _________________
-
----
-
-**Document Version History:**
-- v1.0 (Nov 2025): Initial draft for team review
