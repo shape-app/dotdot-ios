@@ -82,7 +82,7 @@ dotdot/
 ```swift
 struct WatchedEntry: Identifiable, Codable {
     let id: String
-    var userId: String?           // Optional for V1, populated during backend sync
+    let userId: String
     let title: String
     let type: EntryType
     var rating: Int?              // 1-3 (good, great, excellent)
