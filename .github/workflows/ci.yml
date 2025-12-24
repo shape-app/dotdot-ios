@@ -40,10 +40,11 @@ jobs:
         id: simulator
         run: |
           # Find an iPhone 15 simulator with iOS 17.2
-          SIMULATOR=$(xcrun simctl list devices available | grep "iPhone 15" | grep "17.2" | head -1 | sed -E 's/.*\(([^)]+)\).*/\1/')
+          # Format: "    iPhone 15 (UUID) (Shutdown)" - extract UUID (first parentheses group)
+          SIMULATOR=$(xcrun simctl list devices available | grep "iPhone 15" | grep "17.2" | head -1 | sed -E 's/.*\(([A-F0-9-]+)\).*/\1/' | head -1)
           if [ -z "$SIMULATOR" ]; then
             echo "No iPhone 15 iOS 17.2 found, trying any iPhone 15..."
-            SIMULATOR=$(xcrun simctl list devices available | grep "iPhone 15" | head -1 | sed -E 's/.*\(([^)]+)\).*/\1/')
+            SIMULATOR=$(xcrun simctl list devices available | grep "iPhone 15" | head -1 | sed -E 's/.*\(([A-F0-9-]+)\).*/\1/' | head -1)
           fi
           if [ -z "$SIMULATOR" ]; then
             echo "No iPhone 15 found, listing all devices:"
