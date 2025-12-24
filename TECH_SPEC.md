@@ -1,7 +1,8 @@
 # dotdot iOS - Technical Specification
 
-**Date:** November 17, 2025
-**Status:** Draft for Review
+**Created:** November 17, 2025  
+**Last Updated:** December 24, 2025  
+**Status:** Ready for Review
 
 ## 1. Project Overview
 
