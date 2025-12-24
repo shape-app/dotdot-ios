@@ -6,7 +6,7 @@
 
 ## 1. Project Overview
 
-dotdot is a native iOS application that helps users track movies and TV shows they've watched and enjoyed. Users can rate their favorites, add personal notes, mark items as currently watching, and maintain a personal viewing history organized by year.
+dotdot is a native iOS application that helps users track movies, TV shows, variety shows, and anime they've watched. Users can rate entries, add personal notes, mark items as currently watching, and maintain a viewing history organized by year.
 
 ### 1.1 Core Features
 
@@ -17,7 +17,6 @@ dotdot is a native iOS application that helps users track movies and TV shows th
 - Mark items as "currently watching"
 - Add personal notes to entries
 - Search entries by title
-- Rewatch detection with links to previous viewing history
 - Offline support with local persistence
 - Cloud sync across devices (optional for V1)
 
@@ -26,6 +25,7 @@ dotdot is a native iOS application that helps users track movies and TV shows th
 - **Minimum iOS Version:** iOS 17.0 (required for SwiftData)
 - **Target Devices:** iPhone and iPad
 - **Orientation:** Portrait (primary), Landscape (supported)
+- **Language:** English only (V1)
 
 ## 2. Technical Architecture
 
@@ -84,27 +84,22 @@ dotdot/
 └── Resources/          # Fonts, localization files, assets
 ```
 
-**Feature Organization:**
-- Each feature folder contains the View and ViewModel for that feature
-- Feature-specific components and models can live within the feature folder
-- Shared models and components are placed in `Core/` to be used across features
-- Services and utilities remain at the root level as they're cross-cutting concerns
-
 ## 3. Data Models
 
 ### 3.1 Core Models
 
-#### Entry
+#### Entry (SwiftData Model)
 ```swift
-struct Entry: Identifiable, Codable {
-    let id: String
-    let title: String
-    let type: EntryType
+@Model
+final class Entry {
+    @Attribute(.unique) var id: UUID
+    var title: String
+    var type: EntryType
     var rating: Int?
     var notes: String?
-    var country: String?
+    var origin: Origin?
     var watching: Bool
-    let createdAt: Date
+    var createdAt: Date
     var updatedAt: Date
 
     var year: Int {
@@ -113,15 +108,34 @@ struct Entry: Identifiable, Codable {
 }
 ```
 
+#### EntryDTO (API Transfer Object)
+```swift
+struct EntryDTO: Codable {
+    let id: String
+    let title: String
+    let type: String
+    let rating: Int?
+    let notes: String?
+    let origin: String?
+    let watching: Bool
+    let createdAt: Date
+    let updatedAt: Date
+}
+```
+
+**Model ↔ DTO Mapping:**
+- `Entry` is used for local persistence (SwiftData)
+- `EntryDTO` is used for API requests/responses (Codable)
+- Service layer maps between them during sync
+- `Entry.id` (UUID) ↔ `EntryDTO.id` (String) via `uuid.uuidString`
+
 **Design Notes:**
 - Each entry represents a viewing experience (watched or currently watching), tracked by when it was added to the list
 - `userId` is not part of the iOS model - entries are automatically associated with the current authenticated user at the service/sync layer
-- `country` is optional - user can specify the country/region of origin (e.g., "USA", "China", "Japan")
+- `origin` is optional - user can specify where the content is from via picker
 - Year grouping uses `createdAt` date (when user added the entry)
 - If a user rewatches content in a different year, it becomes a new entry
-- The system detects rewatches by querying for entries with the same title
 - Entries are grouped by year in the dashboard (e.g., "2025", "2024")
-- Related entries (same title, different years) are linked in the detail view
 
 #### EntryType
 ```swift
@@ -130,15 +144,13 @@ enum EntryType: String, Codable, CaseIterable {
     case tvShow = "tv_show"
     case varietyShow = "variety_show"
     case anime = "anime"
+}
+```
 
-    var displayName: String {
-        switch self {
-        case .movie: return "Movie"
-        case .tvShow: return "TV Show"
-        case .varietyShow: return "Variety Show"
-        case .anime: return "Anime"
-        }
-    }
+#### Origin
+```swift
+enum Origin: String, Codable, CaseIterable {
+    case usa, uk, korea, japan, china, taiwan, hongKong, thailand, india, france, spain, other
 }
 ```
 
@@ -158,20 +170,18 @@ struct User: Identifiable, Codable {
 - Type: Required (movie, tvShow, varietyShow, or anime)
 - Rating: Optional when `watching = true`, required otherwise (1-3: good, great, excellent)
 - Notes: Optional, max 1000 characters
-- Country: Optional, max 50 characters (free text, can be enhanced with auto-suggestion in future)
+- Origin: Optional, selected from predefined picker (see Origin enum)
 - Watching: Boolean, defaults to false
 
-### 3.3 Rewatch Detection
+### 3.3 Rating Transition Flow
 
-When adding a new entry:
-1. As user types the title, query existing entries (case-insensitive search)
-2. If matches found, display inline: "You watched [Title] in 2013, 2025" with links
-3. User can click to view previous entries or continue adding new entry
+When user marks an entry as "done watching" (`watching: true → false`):
 
-On entry detail view:
-- Display "Watch History" section if related entries exist
-- Show: "You also watched this in [2013](link), [2025](link)"
-- Links navigate directly to the related entry
+1. **Trigger:** User taps "Mark as watched" or similar action
+2. **Modal appears:** Rating picker sheet (1-3 dots: good, great, excellent)
+3. **Required:** User must select a rating to proceed
+4. **Cannot dismiss:** No "skip" option - rating is mandatory for completed entries
+5. **On submit:** Entry updated with `watching = false` and selected rating
 
 ## 4. Design System
 
@@ -207,7 +217,7 @@ Using SF Pro (iOS system font) with system text styles for Dynamic Type support:
 - `DotButton` - Primary, secondary, destructive variants
 - `DotCard` - Container for entry items
 - `RatingPicker` - 1-3 dot selector (good, great, excellent)
-- `DotTextField` - Styled text input with rewatch detection
+- `DotTextField` - Styled text input
 - `DotTextEditor` - Multi-line text input
 - `EntryTypePicker` - Entry type selector (Movie, TV Show, Variety Show, Anime)
 - `SearchBar` - Search entries by title
@@ -223,14 +233,7 @@ Based on 8pt grid:
 
 ## 5. Tech Stack
 
-### 5.1 Core Technologies
-
-- **Language:** Swift 5.9+
-- **UI Framework:** SwiftUI
-- **Minimum iOS:** iOS 17.0 (required for SwiftData)
-- **Architecture:** MVVM
-
-### 5.2 Dependencies
+### 5.1 Dependencies
 
 **Planned (to be added as needed):**
 - Supabase Swift SDK (backend integration)
@@ -239,11 +242,11 @@ Based on 8pt grid:
 
 **No heavy third-party dependencies** - leveraging native iOS frameworks where possible.
 
-### 5.3 Native Frameworks
+### 5.2 Native Frameworks
 
 - `SwiftUI` - UI framework
 - `Combine` - Reactive programming
-- `SwiftData` - Local persistence
+- `SwiftData` - Local persistence (lightweight migration for schema changes; complex migrations addressed as needed)
 - `Foundation` - Core utilities
 - `CryptoKit` - Encryption
 - `AuthenticationServices` - Auth UI
@@ -287,10 +290,9 @@ Based on 8pt grid:
 - Build Dashboard screen UI with year-based grouping
 - Create EntryListView component
 - Implement EntryCardView
-- Build EntryDetailView with watch history links
+- Build EntryDetailView
 - Create mock data for testing
 - Implement search functionality by title
-- Add rewatch detection UI
 
 ### Phase 4: CRUD Operations
 **Duration:** Week 3-4
@@ -354,96 +356,17 @@ Based on 8pt grid:
 
 ## 7. Testing Strategy
 
-### 7.1 Unit Tests
-
-**Models:**
-- Codable encoding/decoding
-- Validation logic
-- Business rules
-
-**ViewModels:**
-- State management
-- Business logic
-- Service interactions (mocked)
-
-**Services:**
-- API client responses
-- Local storage operations
-- Error handling
-
-### 7.2 UI Tests
-
-**Critical User Flows:**
-- Sign up → Login → Dashboard
-- Add entry with rewatch detection → View entry → Edit entry → Delete entry
-- Rating an entry
-- Marking as watching
-- Searching entries
-- Viewing watch history across years
-
-### 7.3 Test Coverage Goals
-
-- **Unit Tests:** 70%+ coverage
-- **UI Tests:** All critical flows
-- **Integration Tests:** Service layer interactions
-
-### 7.4 Testing Tools
-
-- XCTest (built-in)
-- XCUITest (built-in)
-- Mock services for isolated testing
+- **Unit Tests:** Models, ViewModels, Services (70%+ coverage target)
+- **UI Tests:** Critical flows (auth, CRUD, rating, search)
+- **Tools:** XCTest, XCUITest, mock services
 
 ## 8. CI/CD Pipeline
 
-### 8.1 CI Pipeline (Phase 1)
+**CI (implemented):** On every PR → lint, build, test
 
-**Current Setup (Phase 1):**
-The CI pipeline runs on every pull request and push to `main`:
+**CD (Phase 6-9):** TestFlight deployment deferred until features ready
 
-```yaml
-- Checkout code
-- Set up Xcode environment
-- Run SwiftLint
-- Build app
-- Run unit tests
-- Run UI tests
-- Report results
-```
-
-**Status:** ✅ Implemented in Phase 1
-
-### 8.2 CD Pipeline (Phase 6-9)
-
-**Deployment to TestFlight** will be added later when features are ready for beta testing (Phase 6-9):
-
-**On Merge to Main (Future):**
-```yaml
-- All PR checks (above)
-- Increment build number
-- Build release variant
-- Upload to TestFlight (Internal)
-- Tag release in git
-```
-
-**Manual Triggers (Future):**
-- External TestFlight deployment
-- App Store submission
-
-**Status:** ⏳ Deferred - Will be added in Phase 6-9 when ready for beta testing
-
-**Rationale:** TestFlight deployment requires App Store Connect setup, certificates, and a working app with features. Since we're in early development (Phase 1-2), deployment will be added when we have features ready to test.
-
-### 8.3 Versioning
-
-- **Semantic Versioning:** `MAJOR.MINOR.PATCH`
-- **Build Numbers:** Will be auto-incremented on deployment (Phase 6-9)
-- **Git Tags:** Will be created for each TestFlight release (Phase 6-9)
-
-### 8.4 Environments
-
-- **Debug:** Local development with mock data
-- **Staging:** TestFlight internal with dev backend
-- **Production:** App Store with production backend
+**Environments:** Debug (mock data) → Staging (TestFlight) → Production (App Store)
 
 ## 9. Backend Integration (Supabase)
 
@@ -464,7 +387,7 @@ title: text (max 200 chars)
 type: text (enum: 'movie', 'tv_show', 'variety_show', 'anime')
 rating: int (nullable, 1-3: good, great, excellent)
 notes: text (nullable, max 1000 chars)
-country: text (nullable, max 50 chars)
+origin: text (nullable, enum: 'usa', 'uk', 'korea', 'japan', 'china', 'taiwan', 'hong_kong', 'thailand', 'india', 'france', 'spain', 'other')
 watching: boolean (default false)
 created_at: timestamptz (used for year grouping)
 updated_at: timestamptz
@@ -478,7 +401,7 @@ updated_at: timestamptz
 1. All operations work locally first (SwiftData)
 2. Changes queued for sync when online
 3. Background sync on network availability
-4. Conflict resolution: last-write-wins with `updated_at`
+4. Conflict resolution: last-write-wins with `updated_at` (silent, no user notification)
 
 **User Association:**
 - The iOS Entry model does not include `userId` (entries are implicitly associated with the current user)
@@ -487,127 +410,17 @@ updated_at: timestamptz
 
 ### 9.4 Security
 
-- Row Level Security (RLS) on all tables
-- Users can only access their own data
-- JWT tokens stored in iOS Keychain
-- Token refresh handling
-
-## 10. Security & Privacy
-
-### 10.1 Data Security
-
-- All API communication over HTTPS
-- Auth tokens stored in Keychain (not UserDefaults)
-- Biometric authentication option (Face ID/Touch ID)
-- No sensitive data in logs
+- Row Level Security (RLS) on all tables - users only access own data
+- HTTPS for all API communication
+- JWT tokens stored in iOS Keychain (not UserDefaults)
 - Local data encrypted at rest (iOS default)
+- No sensitive data in logs
 
-### 10.2 Privacy
-
-- Minimal data collection
-- Clear privacy policy
-- User data deletion on request
-- No third-party tracking
-- App Tracking Transparency compliance
-
-### 10.3 App Store Requirements
-
-- Privacy nutrition label configuration
-- Data usage declarations
-- Third-party SDK disclosure
-
-## 11. Performance Considerations
-
-### 11.1 Optimization Goals
-
-- **App Launch:** < 2 seconds to interactive
-- **List Scrolling:** 60fps maintained
-- **Network Requests:** < 1 second for CRUD operations
-- **Offline Mode:** Instant feedback on all actions
-
-### 11.2 Strategies
-
-- Lazy loading for large lists
-- Background sync queue
-- Optimistic UI updates
-- Pagination for large datasets
-
-## 12. Accessibility
-
-### 12.1 Requirements
-
-- VoiceOver support for all UI elements
-- Dynamic Type support
-- High contrast mode compatibility
-- Voice Control support
-- Minimum touch target size: 44x44pt
-
-### 12.2 Implementation
-
-- Semantic labels on all interactive elements
-- Accessibility hints for complex interactions
-- Screen reader announcements for state changes
-- Keyboard navigation support (iPad)
-
-## 13. Localization
-
-### 13.1 Phase 1 (MVP)
-
-- English only
-
-### 13.2 Future
-
-- Localization-ready string management
-- Prepared for multiple languages
-- Date/time formatting respects locale
-
-## 14. Error Handling
-
-### 14.1 Error Categories
-
-- **Network Errors:** Retry logic, offline queue
-- **Validation Errors:** Inline form errors
-- **Auth Errors:** Clear messaging, logout handling
-- **Sync Conflicts:** Automatic resolution with user notification
-
-### 14.2 User Experience
-
-- Non-blocking error messages
-- Actionable error states
-- Retry mechanisms
-- Graceful degradation
-
-## 15. Success Metrics
-
-### 15.1 Technical Metrics
-
-- Test coverage > 70%
-- SwiftLint warnings = 0
-- Crash-free rate > 99.5%
-- App Store approval on first submission
-
-### 15.2 Development Metrics
-
-- All PRs pass CI before merge
-- Code review on all changes
-- Documentation for all public APIs
-- Weekly progress updates
-
-## 16. Risks & Mitigations
-
-| Risk | Impact | Mitigation |
-|------|--------|------------|
-| Supabase integration complexity | High | Phase 8 late in timeline, can delay if needed |
-| TestFlight approval delays | Medium | Start TestFlight setup early in Phase 6 |
-| Scope creep | High | Strict phase definitions, defer features post-MVP |
-| Apple guideline changes | Medium | Monitor App Store guidelines throughout |
-| Code signing issues | Medium | Set up early, document process clearly |
-
-## 17. Scope Decisions
+## 10. Scope Decisions
 
 **V1 (MVP) Scope:**
 - ✅ iPad support with optimized layouts
-- ✅ Year-based entry grouping with rewatch detection
+- ✅ Year-based entry grouping
 - ✅ Search functionality
 - ✅ Local-first offline support
 - ✅ Optional cloud sync
