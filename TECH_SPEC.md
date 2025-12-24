@@ -249,11 +249,12 @@ Based on 8pt grid:
 
 - [x] GitHub repository setup
 - [x] Xcode project initialization
-- [x] Folder structure (MVVM)
+- [x] Folder structure (feature-based)
 - [x] SwiftLint configuration
 - [x] Build configurations (Debug/Release)
+- [x] CI pipeline (lint, build, test)
 - [ ] Branch protection rules
-- [ ] Code signing setup
+- [ ] Code signing setup (deferred to Phase 6-9 when deployment needed)
 
 ### Phase 2: Core Architecture & Design System
 **Duration:** Week 1-2
@@ -311,6 +312,7 @@ Based on 8pt grid:
 - Implement email validation
 - Add password requirements
 - Build forgot password flow
+- Set up TestFlight deployment pipeline (when ready for beta testing)
 
 ### Phase 7: Polish & Refinements
 **Duration:** Week 6-7
@@ -340,7 +342,7 @@ Based on 8pt grid:
 - Privacy policy
 - Terms of service
 - Final testing and bug fixes
-- TestFlight beta testing
+- TestFlight beta testing (deployment pipeline set up in Phase 6)
 - App Store submission
 
 ## 7. Testing Strategy
@@ -386,9 +388,11 @@ Based on 8pt grid:
 
 ## 8. CI/CD Pipeline
 
-### 8.1 GitHub Actions Workflow
+### 8.1 CI Pipeline (Phase 1)
 
-**On Pull Request:**
+**Current Setup (Phase 1):**
+The CI pipeline runs on every pull request and push to `main`:
+
 ```yaml
 - Checkout code
 - Set up Xcode environment
@@ -399,7 +403,13 @@ Based on 8pt grid:
 - Report results
 ```
 
-**On Merge to Main:**
+**Status:** ✅ Implemented in Phase 1
+
+### 8.2 CD Pipeline (Phase 6-9)
+
+**Deployment to TestFlight** will be added later when features are ready for beta testing (Phase 6-9):
+
+**On Merge to Main (Future):**
 ```yaml
 - All PR checks (above)
 - Increment build number
@@ -408,17 +418,21 @@ Based on 8pt grid:
 - Tag release in git
 ```
 
-**Manual Triggers:**
+**Manual Triggers (Future):**
 - External TestFlight deployment
 - App Store submission
 
-### 8.2 Versioning
+**Status:** ⏳ Deferred - Will be added in Phase 6-9 when ready for beta testing
+
+**Rationale:** TestFlight deployment requires App Store Connect setup, certificates, and a working app with features. Since we're in early development (Phase 1-2), deployment will be added when we have features ready to test.
+
+### 8.3 Versioning
 
 - **Semantic Versioning:** `MAJOR.MINOR.PATCH`
-- **Build Numbers:** Auto-incremented on main merge
-- **Git Tags:** Created for each TestFlight release
+- **Build Numbers:** Will be auto-incremented on deployment (Phase 6-9)
+- **Git Tags:** Will be created for each TestFlight release (Phase 6-9)
 
-### 8.3 Environments
+### 8.4 Environments
 
 - **Debug:** Local development with mock data
 - **Staging:** TestFlight internal with dev backend
@@ -555,7 +569,7 @@ updated_at: timestamptz
 
 | Phase | Duration | Status |
 |-------|----------|--------|
-| Phase 1: Foundation + CI/CD | Week 1 | Completed ✅ |
+| Phase 1: Foundation + CI | Week 1 | Completed ✅ |
 | Phase 2: Core Architecture | Week 1-2 | Pending |
 | Phase 3: Dashboard | Week 2-3 | Pending |
 | Phase 4: CRUD Operations | Week 3-4 | Pending |
