@@ -1,6 +1,7 @@
 // Copyright (c) 2025-present Shape
 // Licensed under the MIT License
 
+import SwiftData
 import SwiftUI
 
 @main
@@ -10,5 +11,6 @@ struct dotdotApp: App {
         WindowGroup {
             ContentView()
         }
+        .modelContainer(for: Entry.self)
     }
 }
