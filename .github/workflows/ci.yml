@@ -24,10 +24,6 @@ jobs:
     name: Build and Test
     runs-on: macos-14
     needs: lint
-    strategy:
-      matrix:
-        destination:
-          - platform=iOS Simulator,name=Any iOS Simulator Device
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -40,15 +36,16 @@ jobs:
       - name: Show Xcode version
         run: xcodebuild -version
 
-      - name: Show available destinations
-        run: xcodebuild -scheme dotdot -showdestinations
+      - name: List available simulators
+        run: xcrun simctl list devices available
 
       - name: Build app
         run: |
           xcodebuild clean build \
             -project dotdot.xcodeproj \
             -scheme dotdot \
-            -destination "${{ matrix.destination }}" \
+            -sdk iphonesimulator \
+            -destination 'platform=iOS Simulator,OS=latest' \
             CODE_SIGN_IDENTITY="" \
             CODE_SIGNING_REQUIRED=NO
 
@@ -57,7 +54,8 @@ jobs:
           xcodebuild test \
             -project dotdot.xcodeproj \
             -scheme dotdot \
-            -destination "${{ matrix.destination }}" \
+            -sdk iphonesimulator \
+            -destination 'platform=iOS Simulator,OS=latest' \
             CODE_SIGN_IDENTITY="" \
             CODE_SIGNING_REQUIRED=NO
 
