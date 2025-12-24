@@ -64,15 +64,30 @@ The app follows the **Model-View-ViewModel** pattern with SwiftUI:
 
 ### 2.2 Project Structure
 
+The project uses a **feature-based organization** where each feature contains its own View and ViewModel in a dedicated folder. This approach improves code discoverability and maintainability as the project grows.
+
 ```
 dotdot/
-├── Models/              # Data models and business entities
-├── Views/              # SwiftUI views and UI components
-├── ViewModels/         # ObservableObject view models
-├── Services/           # API clients, storage, auth
+├── Features/           # Feature-based modules
+│   ├── Dashboard/      # Dashboard view + ViewModel
+│   ├── EntryDetail/    # Entry detail view + ViewModel
+│   ├── AddEntry/       # Add entry form view + ViewModel
+│   ├── EditEntry/      # Edit entry form view + ViewModel
+│   ├── Auth/           # Authentication views + ViewModels
+│   └── Search/         # Search view + ViewModel
+├── Core/               # Shared domain code
+│   ├── Models/         # Shared domain models (WatchedEntry, User, EntryType)
+│   └── Shared/         # Shared components and utilities
+├── Services/           # API clients, storage, authentication services
 ├── Utilities/          # Extensions, helpers, constants
-└── Resources/          # Fonts, localization files
+└── Resources/          # Fonts, localization files, assets
 ```
+
+**Feature Organization:**
+- Each feature folder contains the View and ViewModel for that feature
+- Feature-specific components and models can live within the feature folder
+- Shared models and components are placed in `Core/` to be used across features
+- Services and utilities remain at the root level as they're cross-cutting concerns
 
 ## 3. Data Models
 
