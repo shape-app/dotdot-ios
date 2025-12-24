@@ -4,14 +4,32 @@
 import SwiftUI
 
 struct ContentView: View {
+    @StateObject private var router = Router()
+
     var body: some View {
-        VStack {
-            Image(systemName: "globe")
-                .imageScale(.large)
-                .foregroundStyle(.tint)
-            Text("Hello, world!")
+        NavigationStack(path: $router.path) {
+            DashboardView()
+                .navigationDestination(for: Route.self) { route in
+                    destinationView(for: route)
+                }
         }
-        .padding()
+        .environmentObject(router)
+    }
+
+    @ViewBuilder
+    private func destinationView(for route: Route) -> some View {
+        switch route {
+        case .dashboard:
+            DashboardView()
+        case .entryDetail(let entry):
+            EntryDetailView(entry: entry)
+        case .addEntry:
+            AddEntryView()
+        case .editEntry(let entry):
+            EditEntryView(entry: entry)
+        case .search:
+            SearchView()
+        }
     }
 }
 
