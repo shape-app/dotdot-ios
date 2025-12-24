@@ -36,16 +36,33 @@ jobs:
       - name: Show Xcode version
         run: xcodebuild -version
 
-      - name: List available simulators
-        run: xcrun simctl list devices available
+      - name: Find available iPhone simulator
+        id: simulator
+        run: |
+          # Find an iPhone 15 simulator with iOS 17.2
+          SIMULATOR=$(xcrun simctl list devices available | grep "iPhone 15" | grep "17.2" | head -1 | sed -E 's/.*\(([^)]+)\).*/\1/')
+          if [ -z "$SIMULATOR" ]; then
+            echo "No iPhone 15 iOS 17.2 found, trying any iPhone 15..."
+            SIMULATOR=$(xcrun simctl list devices available | grep "iPhone 15" | head -1 | sed -E 's/.*\(([^)]+)\).*/\1/')
+          fi
+          if [ -z "$SIMULATOR" ]; then
+            echo "No iPhone 15 found, listing all devices:"
+            xcrun simctl list devices available
+            exit 1
+          fi
+          echo "simulator_id=$SIMULATOR" >> $GITHUB_OUTPUT
+          echo "Using simulator: $SIMULATOR"
+
+      - name: Boot simulator
+        run: |
+          xcrun simctl boot "${{ steps.simulator.outputs.simulator_id }}" || true
 
       - name: Build app
         run: |
           xcodebuild clean build \
             -project dotdot.xcodeproj \
             -scheme dotdot \
-            -sdk iphonesimulator \
-            -destination 'platform=iOS Simulator,OS=latest' \
+            -destination "platform=iOS Simulator,id=${{ steps.simulator.outputs.simulator_id }}" \
             CODE_SIGN_IDENTITY="" \
             CODE_SIGNING_REQUIRED=NO
 
@@ -54,8 +71,7 @@ jobs:
           xcodebuild test \
             -project dotdot.xcodeproj \
             -scheme dotdot \
-            -sdk iphonesimulator \
-            -destination 'platform=iOS Simulator,OS=latest' \
+            -destination "platform=iOS Simulator,id=${{ steps.simulator.outputs.simulator_id }}" \
             CODE_SIGN_IDENTITY="" \
             CODE_SIGNING_REQUIRED=NO
 
