@@ -25,7 +25,9 @@ platform :ios do
     )
   end
 
-  desc "Deploy to TestFlight"
+  desc "Deploy to TestFlight (Future - Phase 6-9)"
+  # Note: This lane is prepared for future use when deployment is needed.
+  # See CI_SETUP.md and TECH_SPEC.md for deployment timeline.
   lane :deploy_testflight do |options|
     # Ensure we're on a clean state
     ensure_git_status_clean
@@ -77,7 +79,8 @@ platform :ios do
     )
   end
 
-  desc "Register new devices"
+  desc "Register new devices (Future - Phase 6-9)"
+  # Note: Device registration will be needed for Ad Hoc builds.
   lane :register_devices do
     register_devices(
       devices_file: "./fastlane/devices.txt"
@@ -93,7 +96,8 @@ platform :ios do
     )
   end
 
-  desc "Prepare for release"
+  desc "Prepare for release (Future - Phase 6-9)"
+  # Note: Release preparation will be used when deploying to TestFlight/App Store.
   lane :prepare_release do |options|
     ensure_git_status_clean
 

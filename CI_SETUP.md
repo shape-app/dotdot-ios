@@ -107,20 +107,26 @@ bundle exec fastlane build
 
 ### Updating Xcode Version
 
-When a new Xcode version is released:
+The CI workflow uses a specific Xcode version for consistency. When updating:
 
-1. Update `DEVELOPER_DIR` in `.github/workflows/ci.yml`:
+1. **Check available Xcode versions** in GitHub Actions:
+   - GitHub Actions runners typically have multiple Xcode versions
+   - Check [GitHub Actions documentation](https://github.com/actions/runner-images) for available versions
+
+2. Update `DEVELOPER_DIR` in `.github/workflows/ci.yml`:
 ```yaml
 env:
   DEVELOPER_DIR: /Applications/Xcode_15.3.app/Contents/Developer
 ```
 
-2. Update iOS simulator destination:
+3. Update iOS simulator destination (if OS version changes):
 ```yaml
 destination: platform=iOS Simulator,name=iPhone 15,OS=17.4
 ```
+   - Verify the simulator exists by checking available destinations
+   - Can test locally: `xcodebuild -scheme dotdot -showdestinations`
 
-3. Test locally before committing
+4. **Test locally** before committing to ensure the version exists
 
 ## Future: Deployment (To Be Added)
 
@@ -129,7 +135,7 @@ When ready to add TestFlight deployment (Phase 6-9):
 - Fastfile already contains `deploy_testflight` lane for future use
 - Will require App Store Connect setup
 - See Fastfile comments for deployment configuration
-- Will add `.github/workflows/deploy.yml` when needed
+- Will add `.github/workflows/deploy.yml` and update this guide when needed
 
 ## Support
 
