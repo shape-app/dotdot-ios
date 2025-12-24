@@ -76,7 +76,7 @@ dotdot/
 │   ├── Auth/           # Authentication views + ViewModels
 │   └── Search/         # Search view + ViewModel
 ├── Core/               # Shared domain code
-│   ├── Models/         # Shared domain models (WatchedEntry, User, EntryType)
+│   ├── Models/         # Shared domain models (Entry, User, EntryType)
 │   └── Shared/         # Shared components and utilities
 ├── Services/           # API clients, storage, authentication services
 ├── Utilities/          # Extensions, helpers, constants
@@ -93,20 +93,19 @@ dotdot/
 
 ### 3.1 Core Models
 
-#### WatchedEntry
+#### Entry
 ```swift
-struct WatchedEntry: Identifiable, Codable {
+struct Entry: Identifiable, Codable {
     let id: String
-    let userId: String
     let title: String
     let type: EntryType
-    var rating: Int?              // 1-3 (good, great, excellent)
+    var rating: Int?
     var notes: String?
-    var watching: Bool            // Currently watching flag
+    var country: String?
+    var watching: Bool
     let createdAt: Date
     var updatedAt: Date
 
-    // Computed property for year grouping
     var year: Int {
         Calendar.current.component(.year, from: createdAt)
     }
@@ -114,7 +113,9 @@ struct WatchedEntry: Identifiable, Codable {
 ```
 
 **Design Notes:**
-- Each entry represents a viewing experience, tracked by when it was added to the list
+- Each entry represents a viewing experience (watched or currently watching), tracked by when it was added to the list
+- `userId` is not part of the iOS model - entries are automatically associated with the current authenticated user at the service/sync layer
+- `country` is optional - user can specify the country/region of origin (e.g., "USA", "China", "Japan")
 - Year grouping uses `createdAt` date (when user added the entry)
 - If a user rewatches content in a different year, it becomes a new entry
 - The system detects rewatches by querying for entries with the same title
@@ -126,11 +127,15 @@ struct WatchedEntry: Identifiable, Codable {
 enum EntryType: String, Codable, CaseIterable {
     case movie = "movie"
     case tvShow = "tv_show"
+    case varietyShow = "variety_show"
+    case anime = "anime"
 
     var displayName: String {
         switch self {
         case .movie: return "Movie"
         case .tvShow: return "TV Show"
+        case .varietyShow: return "Variety Show"
+        case .anime: return "Anime"
         }
     }
 }
@@ -147,12 +152,15 @@ struct User: Identifiable, Codable {
 
 ### 3.2 Validation Rules
 
-**WatchedEntry validation:**
+**Entry validation:**
 - Title: Required, max 200 characters
-- Type: Required (movie or tv_show)
+- Type: Required (movie, tvShow, varietyShow, or anime)
 - Rating: Optional when `watching = true`, required otherwise (1-3: good, great, excellent)
 - Notes: Optional, max 1000 characters
+- Country: Optional, max 50 characters (free text, can be enhanced with auto-suggestion in future)
 - Watching: Boolean, defaults to false
+
+**Note:** `userId` is not part of the iOS Entry model. The service layer automatically associates entries with the current authenticated user when syncing to the backend.
 
 ### 3.3 Rewatch Detection
 
@@ -202,7 +210,7 @@ Using SF Pro (iOS system font) with the following scale:
 - `RatingPicker` - 1-3 dot selector (good, great, excellent)
 - `DotTextField` - Styled text input with rewatch detection
 - `DotTextEditor` - Multi-line text input
-- `EntryTypePicker` - Movie/TV show selector
+- `EntryTypePicker` - Entry type selector (Movie, TV Show, Variety Show, Anime)
 - `SearchBar` - Search entries by title
 
 ### 4.4 Spacing System
@@ -260,7 +268,7 @@ Based on 8pt grid:
 **Duration:** Week 1-2
 
 **Phase 2.1:** Data Models
-- Create `WatchedEntry`, `EntryType`, `User` models
+- Create `Entry`, `EntryType`, `User` models
 - Implement validation logic
 - Add Codable conformance
 
@@ -449,14 +457,15 @@ The CI pipeline runs on every pull request and push to `main`:
 
 ### 9.2 Database Schema
 
-**watched_entries table:**
+**entries table:**
 ```sql
 id: uuid (primary key)
 user_id: uuid (foreign key to auth.users)
 title: text (max 200 chars)
-type: text (enum: 'movie', 'tv_show')
+type: text (enum: 'movie', 'tv_show', 'variety_show', 'anime')
 rating: int (nullable, 1-3: good, great, excellent)
 notes: text (nullable, max 1000 chars)
+country: text (nullable, max 50 chars)
 watching: boolean (default false)
 created_at: timestamptz (used for year grouping)
 updated_at: timestamptz
@@ -471,6 +480,11 @@ updated_at: timestamptz
 2. Changes queued for sync when online
 3. Background sync on network availability
 4. Conflict resolution: last-write-wins with `updated_at`
+
+**User Association:**
+- The iOS Entry model does not include `userId` (entries are implicitly associated with the current user)
+- The service/sync layer automatically injects `userId` from the authenticated session when syncing to backend
+- Backend schema requires `userId` for Row Level Security (RLS) to ensure users can only access their own entries
 
 ### 9.4 Security
 
