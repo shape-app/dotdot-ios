@@ -3,6 +3,7 @@
 
 import XCTest
 
+// swiftlint:disable:next type_name
 final class dotdotUITests: XCTestCase {
 
     override func setUpWithError() throws {
