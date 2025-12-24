@@ -2,6 +2,7 @@
 // Licensed under the MIT License
 
 @testable import dotdot
+import Foundation
 import Testing
 
 struct OriginTests {

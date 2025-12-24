@@ -123,8 +123,8 @@ struct EntryTests {
         let entry = Entry(
             title: "Test Movie",
             type: .movie,
-            notes: longNotes,
             rating: 2,
+            notes: longNotes,
             watching: false
         )
         #expect(entry.isValid == false)
