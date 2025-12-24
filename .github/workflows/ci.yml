@@ -39,16 +39,17 @@ jobs:
       - name: Find available iPhone simulator
         id: simulator
         run: |
-          # Find an iPhone 15 simulator with iOS 17.2
-          # Extract UUID using pattern matching (UUID format: 8-4-4-4-12 hex digits)
-          SIMULATOR=$(xcrun simctl list devices available | grep "iPhone 15" | grep "17.2" | head -1 | grep -oE '[A-F0-9]{8}-[A-F0-9]{4}-[A-F0-9]{4}-[A-F0-9]{4}-[A-F0-9]{12}')
-          if [ -z "$SIMULATOR" ]; then
-            echo "No iPhone 15 iOS 17.2 found, trying any iPhone 15..."
-            SIMULATOR=$(xcrun simctl list devices available | grep "iPhone 15" | head -1 | grep -oE '[A-F0-9]{8}-[A-F0-9]{4}-[A-F0-9]{4}-[A-F0-9]{4}-[A-F0-9]{12}')
-          fi
-          if [ -z "$SIMULATOR" ]; then
+          # Find any available iPhone 15 simulator (UUID format: 8-4-4-4-12 hex digits)
+          # Note: iOS version is on a header line, so we just match device name
+          LINE=$(xcrun simctl list devices available | grep "iPhone 15" | head -1)
+          if [ -z "$LINE" ]; then
             echo "No iPhone 15 found, listing all devices:"
             xcrun simctl list devices available
+            exit 1
+          fi
+          SIMULATOR=$(echo "$LINE" | grep -oE '[A-F0-9]{8}-[A-F0-9]{4}-[A-F0-9]{4}-[A-F0-9]{4}-[A-F0-9]{12}')
+          if [ -z "$SIMULATOR" ]; then
+            echo "Failed to extract UUID from line: $LINE"
             exit 1
           fi
           echo "simulator_id=$SIMULATOR" >> $GITHUB_OUTPUT
