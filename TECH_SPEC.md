@@ -11,7 +11,7 @@ dotdot is a native iOS application that helps users track movies and TV shows th
 
 - User authentication (email/password)
 - Dashboard view with entries grouped by year (2025, 2024, etc.)
-- Add/Edit/Delete watched entries
+- Add/Edit/Delete entries
 - Rating system (1-3 dots: good, great, excellent)
 - Mark items as "currently watching"
 - Add personal notes to entries
@@ -22,7 +22,7 @@ dotdot is a native iOS application that helps users track movies and TV shows th
 
 ### 1.2 Target Platform
 
-- **Minimum iOS Version:** iOS 16.0
+- **Minimum iOS Version:** iOS 17.0 (required for SwiftData)
 - **Target Devices:** iPhone and iPad
 - **Orientation:** Portrait (primary), Landscape (supported)
 
@@ -160,8 +160,6 @@ struct User: Identifiable, Codable {
 - Country: Optional, max 50 characters (free text, can be enhanced with auto-suggestion in future)
 - Watching: Boolean, defaults to false
 
-**Note:** `userId` is not part of the iOS Entry model. The service layer automatically associates entries with the current authenticated user when syncing to the backend.
-
 ### 3.3 Rewatch Detection
 
 When adding a new entry:
@@ -194,13 +192,13 @@ On entry detail view:
 
 ### 4.2 Typography
 
-Using SF Pro (iOS system font) with the following scale:
+Using SF Pro (iOS system font) with system text styles for Dynamic Type support:
 
-- **Title**: 28pt Bold
-- **Headline**: 20pt Semibold
-- **Body**: 17pt Regular
-- **Caption**: 13pt Regular
-- **Button**: 17pt Semibold
+- **Title**: `.largeTitle` (system font, automatically scales)
+- **Headline**: `.headline` (system font, automatically scales)
+- **Body**: `.body` (system font, automatically scales)
+- **Caption**: `.caption` (system font, automatically scales)
+- **Button**: `.body` with semibold weight
 
 ### 4.3 Components
 
@@ -228,7 +226,7 @@ Based on 8pt grid:
 
 - **Language:** Swift 5.9+
 - **UI Framework:** SwiftUI
-- **Minimum iOS:** 16.0
+- **Minimum iOS:** iOS 17.0 (required for SwiftData)
 - **Architecture:** MVVM
 
 ### 5.2 Dependencies
@@ -244,7 +242,7 @@ Based on 8pt grid:
 
 - `SwiftUI` - UI framework
 - `Combine` - Reactive programming
-- `CoreData` - Local persistence
+- `SwiftData` - Local persistence
 - `Foundation` - Core utilities
 - `CryptoKit` - Encryption
 - `AuthenticationServices` - Auth UI
@@ -300,7 +298,7 @@ Based on 8pt grid:
 - Build EditEntryView
 - Implement delete confirmation
 - Add form validation with error messages
-- Connect to local storage (CoreData)
+- Connect to local storage (SwiftData)
 - Implement offline-first data flow
 
 ### Phase 5: Testing Foundation
@@ -384,7 +382,7 @@ Based on 8pt grid:
 
 ### 7.3 Test Coverage Goals
 
-- **Unit Tests:** 80%+ coverage
+- **Unit Tests:** 70%+ coverage
 - **UI Tests:** All critical flows
 - **Integration Tests:** Service layer interactions
 
@@ -453,7 +451,7 @@ The CI pipeline runs on every pull request and push to `main`:
 - **Authentication:** Email/password auth
 - **Database:** PostgreSQL for entries and user data
 - **Real-time:** Live sync across devices
-- **Storage:** Future: poster images, profile photos
+- **Storage:** Future: profile photos (if needed)
 
 ### 9.2 Database Schema
 
@@ -476,7 +474,7 @@ updated_at: timestamptz
 ### 9.3 Sync Strategy
 
 **Offline-First Approach:**
-1. All operations work locally first (CoreData)
+1. All operations work locally first (SwiftData)
 2. Changes queued for sync when online
 3. Background sync on network availability
 4. Conflict resolution: last-write-wins with `updated_at`
@@ -529,7 +527,6 @@ updated_at: timestamptz
 ### 11.2 Strategies
 
 - Lazy loading for large lists
-- Image caching (when images added)
 - Background sync queue
 - Optimistic UI updates
 - Pagination for large datasets
@@ -579,49 +576,33 @@ updated_at: timestamptz
 - Retry mechanisms
 - Graceful degradation
 
-## 15. Timeline Summary
+## 15. Success Metrics
 
-| Phase | Duration | Status |
-|-------|----------|--------|
-| Phase 1: Foundation + CI | Week 1 | Completed ✅ |
-| Phase 2: Core Architecture | Week 1-2 | Pending |
-| Phase 3: Dashboard | Week 2-3 | Pending |
-| Phase 4: CRUD Operations | Week 3-4 | Pending |
-| Phase 5: Testing | Week 4 | Pending |
-| Phase 6: Authentication | Week 5-6 | Pending |
-| Phase 7: Polish | Week 6-7 | Pending |
-| Phase 8: Backend Integration | Week 7-8 | Pending |
-| Phase 9: App Store Prep | Week 9 | Pending |
-
-**Total Estimated Timeline:** 9 weeks to App Store submission
-
-## 16. Success Metrics
-
-### 16.1 Technical Metrics
+### 15.1 Technical Metrics
 
 - Test coverage > 70%
 - SwiftLint warnings = 0
 - Crash-free rate > 99.5%
 - App Store approval on first submission
 
-### 16.2 Development Metrics
+### 15.2 Development Metrics
 
 - All PRs pass CI before merge
 - Code review on all changes
 - Documentation for all public APIs
 - Weekly progress updates
 
-## 17. Risks & Mitigations
+## 16. Risks & Mitigations
 
 | Risk | Impact | Mitigation |
 |------|--------|------------|
-| Supabase integration complexity | High | Phase 9 late in timeline, can delay if needed |
+| Supabase integration complexity | High | Phase 8 late in timeline, can delay if needed |
 | TestFlight approval delays | Medium | Start TestFlight setup early in Phase 6 |
 | Scope creep | High | Strict phase definitions, defer features post-MVP |
 | Apple guideline changes | Medium | Monitor App Store guidelines throughout |
 | Code signing issues | Medium | Set up early, document process clearly |
 
-## 18. Scope Decisions
+## 17. Scope Decisions
 
 **V1 (MVP) Scope:**
 - ✅ iPad support with optimized layouts
