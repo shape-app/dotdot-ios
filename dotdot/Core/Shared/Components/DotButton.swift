@@ -75,4 +75,3 @@ struct DotButton: View {
     .padding()
     .background(Color.background)
 }
-

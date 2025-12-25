@@ -8,7 +8,7 @@ struct DotTextField: View {
     @Binding var text: String
     var placeholder: String = ""
     var isSecure: Bool = false
-    var errorMessage: String? = nil
+    var errorMessage: String?
 
     var body: some View {
         VStack(alignment: .leading, spacing: Spacing.xs) {
@@ -69,4 +69,3 @@ struct DotTextField: View {
     .padding()
     .background(Color.background)
 }
-

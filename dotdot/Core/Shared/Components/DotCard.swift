@@ -36,4 +36,3 @@ struct DotCard<Content: View>: View {
     .padding()
     .background(Color.background)
 }
-

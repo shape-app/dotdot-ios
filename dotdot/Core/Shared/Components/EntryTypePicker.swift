@@ -77,4 +77,3 @@ struct EntryTypePicker: View {
         .padding()
         .background(Color.background)
 }
-

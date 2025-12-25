@@ -57,32 +57,21 @@ struct OriginPicker: View {
     }
 
     private func displayName(for origin: Origin) -> String {
-        switch origin {
-        case .usa:
-            return "USA"
-        case .uk:
-            return "UK"
-        case .korea:
-            return "Korea"
-        case .japan:
-            return "Japan"
-        case .china:
-            return "China"
-        case .taiwan:
-            return "Taiwan"
-        case .hongKong:
-            return "Hong Kong"
-        case .thailand:
-            return "Thailand"
-        case .india:
-            return "India"
-        case .france:
-            return "France"
-        case .spain:
-            return "Spain"
-        case .other:
-            return "Other"
-        }
+        let displayNames: [Origin: String] = [
+            .usa: "USA",
+            .uk: "UK",
+            .korea: "Korea",
+            .japan: "Japan",
+            .china: "China",
+            .taiwan: "Taiwan",
+            .hongKong: "Hong Kong",
+            .thailand: "Thailand",
+            .india: "India",
+            .france: "France",
+            .spain: "Spain",
+            .other: "Other"
+        ]
+        return displayNames[origin] ?? "Other"
     }
 }
 
@@ -91,4 +80,3 @@ struct OriginPicker: View {
         .padding()
         .background(Color.background)
 }
-

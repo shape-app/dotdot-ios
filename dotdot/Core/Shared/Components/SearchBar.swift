@@ -40,4 +40,3 @@ struct SearchBar: View {
         .padding()
         .background(Color.background)
 }
-

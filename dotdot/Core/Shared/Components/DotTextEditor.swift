@@ -7,8 +7,8 @@ struct DotTextEditor: View {
     let title: String
     @Binding var text: String
     var placeholder: String = ""
-    var errorMessage: String? = nil
-    var maxLength: Int? = nil
+    var errorMessage: String?
+    var maxLength: Int?
 
     var body: some View {
         VStack(alignment: .leading, spacing: Spacing.xs) {
@@ -66,9 +66,8 @@ struct DotTextEditor: View {
         title: "Notes",
         text: .constant(""),
         placeholder: "Add your notes here...",
-        maxLength: 1000
+        maxLength: 1_000
     )
     .padding()
     .background(Color.background)
 }
-
