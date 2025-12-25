@@ -13,4 +13,3 @@ extension Color {
     static let error = Color("Error", bundle: .main)
     static let success = Color("Success", bundle: .main)
 }
-

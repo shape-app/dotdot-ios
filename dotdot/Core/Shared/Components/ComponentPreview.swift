@@ -71,7 +71,7 @@ struct ComponentPreview: View {
                         title: "Notes",
                         text: .constant(""),
                         placeholder: "Add your notes here...",
-                        maxLength: 1000
+                        maxLength: 1_000
                     )
                 }
 
@@ -124,4 +124,3 @@ struct ComponentPreview: View {
 #Preview {
     ComponentPreview()
 }
-
