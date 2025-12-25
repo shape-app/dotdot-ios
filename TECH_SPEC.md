@@ -187,49 +187,36 @@ When user marks an entry as "done watching" (`watching: true → false`):
 
 ### 4.1 Color Palette
 
-```swift
-// Primary Colors
-- Primary: Purple (#B794F4 / HSL 272° 91% 72%)
-- Background: Dark (#0a0a0a)
-- Surface: Dark Gray (#1a1a1a)
-
-// UI Colors
-- Border: White 10% opacity
-- Text Primary: White (#ffffff)
-- Text Secondary: Gray (#9ca3af)
-- Error: Red (#ef4444)
-- Success: Green (#10b981)
-```
+| Role | Color | Hex |
+|------|-------|-----|
+| Primary | Purple | #B794F4 |
+| Background | Dark | #0a0a0a |
+| Surface | Dark Gray | #1a1a1a |
+| Border | White 10% | - |
+| Text Primary | White | #ffffff |
+| Text Secondary | Gray | #9ca3af |
+| Error | Red | #ef4444 |
+| Success | Green | #10b981 |
 
 ### 4.2 Typography
 
-Using SF Pro (iOS system font) with system text styles for Dynamic Type support:
-
-- **Title**: `.largeTitle` (system font, automatically scales)
-- **Headline**: `.headline` (system font, automatically scales)
-- **Body**: `.body` (system font, automatically scales)
-- **Caption**: `.caption` (system font, automatically scales)
-- **Button**: `.body` with semibold weight
+- System font (SF Pro) with Dynamic Type support
+- Text hierarchy: Title, Headline, Body, Caption
+- Button text: Semibold weight
 
 ### 4.3 Components
 
-#### Reusable UI Components
-- `DotButton` - Primary, secondary, destructive variants
-- `DotCard` - Container for entry items
-- `RatingPicker` - 1-3 dot selector (good, great, excellent)
-- `DotTextField` - Styled text input
-- `DotTextEditor` - Multi-line text input
-- `EntryTypePicker` - Entry type selector (Movie, TV Show, Variety Show, Anime)
-- `SearchBar` - Search entries by title
+Reusable UI elements needed:
+- **Buttons** - Primary, secondary, destructive variants
+- **Cards** - Container for entry items
+- **Rating picker** - 1-3 dot selector (good, great, excellent)
+- **Text inputs** - Single-line and multi-line variants
+- **Type picker** - Entry type selector
+- **Search bar** - Search entries by title
 
-### 4.4 Spacing System
+### 4.4 Spacing
 
-Based on 8pt grid:
-- `xs`: 4pt
-- `sm`: 8pt
-- `md`: 16pt
-- `lg`: 24pt
-- `xl`: 32pt
+8pt grid system: 4 / 8 / 16 / 24 / 32
 
 ## 5. Tech Stack
 
