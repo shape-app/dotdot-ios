@@ -18,4 +18,3 @@ struct AddEntryView: View {
 #Preview {
     AddEntryView()
 }
-

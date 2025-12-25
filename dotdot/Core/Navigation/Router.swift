@@ -19,4 +19,3 @@ class Router: ObservableObject {
         path.removeLast(path.count)
     }
 }
-

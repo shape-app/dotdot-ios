@@ -30,4 +30,3 @@ struct EntryDetailView: View {
         )
     )
 }
-

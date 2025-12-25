@@ -10,4 +10,3 @@ enum Route: Hashable {
     case editEntry(Entry)
     case search
 }
-
