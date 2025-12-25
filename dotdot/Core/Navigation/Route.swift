@@ -2,6 +2,7 @@
 // Licensed under the MIT License
 
 import Foundation
+import SwiftData
 
 enum Route: Hashable {
     case dashboard
