@@ -29,6 +29,26 @@
 		2D3729402ECB95630092C153 /* dotdotUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = dotdotUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
+/* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
+		2D3729532ECB95640092C153 /* Exceptions for "dotdot" folder in "dotdot" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				Core/Models/.gitkeep,
+				Core/Shared/.gitkeep,
+				Features/AddEntry/.gitkeep,
+				Features/Auth/.gitkeep,
+				Features/Dashboard/.gitkeep,
+				Features/EditEntry/.gitkeep,
+				Features/EntryDetail/.gitkeep,
+				Features/Search/.gitkeep,
+				Resources/.gitkeep,
+				Services/.gitkeep,
+				Utilities/.gitkeep,
+			);
+			target = 2D3729282ECB95610092C153 /* dotdot */;
+		};
+/* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
+
 /* Begin PBXFileSystemSynchronizedRootGroup section */
 		2D37292B2ECB95610092C153 /* dotdot */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
@@ -49,26 +69,6 @@
 			sourceTree = "<group>";
 		};
 /* End PBXFileSystemSynchronizedRootGroup section */
-
-/* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
-		2D3729532ECB95640092C153 /* Exceptions for "dotdot" folder in "dotdot" target */ = {
-			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
-			membershipExceptions = (
-				"Core/Models/.gitkeep",
-				"Core/Shared/.gitkeep",
-				"Features/AddEntry/.gitkeep",
-				"Features/Auth/.gitkeep",
-				"Features/Dashboard/.gitkeep",
-				"Features/EditEntry/.gitkeep",
-				"Features/EntryDetail/.gitkeep",
-				"Features/Search/.gitkeep",
-				"Resources/.gitkeep",
-				"Services/.gitkeep",
-				"Utilities/.gitkeep",
-			);
-			target = 2D3729282ECB95610092C153 /* dotdot */;
-		};
-/* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
 
 /* Begin PBXFrameworksBuildPhase section */
 		2D3729262ECB95610092C153 /* Frameworks */ = {
