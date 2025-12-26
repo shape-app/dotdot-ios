@@ -1,20 +1,16 @@
 // Copyright (c) 2025-present Shape
 // Licensed under the MIT License
 
+import SwiftData
 import SwiftUI
 
 struct ContentView: View {
     var body: some View {
-        VStack {
-            Image(systemName: "globe")
-                .imageScale(.large)
-                .foregroundStyle(.tint)
-            Text("Hello, world!")
-        }
-        .padding()
+        DashboardView()
     }
 }
 
 #Preview {
     ContentView()
+        .modelContainer(for: Entry.self, inMemory: true)
 }
