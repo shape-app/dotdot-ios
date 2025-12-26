@@ -14,7 +14,7 @@
 
 ---
 
-## Phase 2: Core Architecture & Design System
+## Phase 2: Core Architecture & Design System ✅
 
 ### Phase 2.1: Data Models
 - [x] Create `Entry`, `EntryType`, `User` models
@@ -26,12 +26,73 @@
 - [x] Create typography system
 - [x] Build reusable UI components (buttons, cards, inputs)
 
-### Phase 2.3: Navigation
-- [x] Set up NavigationStack
-- [x] Create routing structure
-- [x] Define screen flow
+---
 
-### Phase 2.4: Architecture Design (Offline-First + Backend Sync)
+## Phase 3: Dashboard & List Views
+
+- [ ] Build Dashboard screen UI with year-based grouping
+- [ ] Create EntryListView component
+- [ ] Implement EntryCardView
+- [ ] Build EntryDetailView
+- [ ] Build AddEntryView with form validation
+- [ ] Build EditEntryView
+- [ ] Create mock data for testing
+- [ ] Implement search functionality by title
+
+---
+
+## Phase 4: Authenticated Navigation
+
+- [ ] Set up NavigationStack for main app
+- [ ] Create routing structure
+- [ ] Define screen flow
+
+---
+
+## Phase 5: CRUD Operations
+
+- [ ] Implement delete confirmation
+- [ ] Add form validation with error messages
+- [ ] Connect to local storage (SwiftData)
+- [ ] Implement offline-first data flow
+
+---
+
+## Phase 6: Testing Foundation
+
+- [ ] Unit tests for models and validation
+- [ ] Unit tests for view models
+- [ ] UI tests for critical user flows
+- [ ] Test coverage target: 70%+
+
+---
+
+## Phase 7: Landing & Authentication
+
+- [ ] Build landing screen
+- [ ] Build onboarding screens
+- [ ] Create sign up flow
+- [ ] Create login flow
+- [ ] Implement email validation
+- [ ] Add password requirements
+- [ ] Build forgot password flow
+- [ ] Implement root navigation (auth/unauth flow switching)
+
+---
+
+## Phase 8: Polish & Refinements
+
+- [ ] Add animations and transitions
+- [ ] Implement accessibility features
+- [ ] Add haptic feedback
+- [ ] Error handling and retry logic
+- [ ] Empty states and loading indicators
+- [ ] Dark mode support (if not already)
+
+---
+
+## Phase 9: Architecture Design (Offline-First + Backend Sync)
+
 - [ ] Design offline-first architecture pattern
 - [ ] Define Service Layer responsibilities
 - [ ] Design Repository + API Client interaction
@@ -43,62 +104,7 @@
 
 ---
 
-## Phase 3: Dashboard & List Views
-
-- [ ] Build Dashboard screen UI with year-based grouping
-- [ ] Create EntryListView component
-- [ ] Implement EntryCardView
-- [ ] Build EntryDetailView
-- [ ] Create mock data for testing
-- [ ] Implement search functionality by title
-
----
-
-## Phase 4: CRUD Operations
-
-- [ ] Build AddEntryView with form validation
-- [ ] Build EditEntryView
-- [ ] Implement delete confirmation
-- [ ] Add form validation with error messages
-- [ ] Connect to local storage (SwiftData)
-- [ ] Implement offline-first data flow
-
----
-
-## Phase 5: Testing Foundation
-
-- [ ] Unit tests for models and validation
-- [ ] Unit tests for view models
-- [ ] UI tests for critical user flows
-- [ ] Test coverage target: 70%+
-
----
-
-## Phase 6: Landing & Authentication
-
-- [ ] Code signing setup (for TestFlight/device testing)
-- [ ] Build landing/onboarding screens
-- [ ] Create sign up flow
-- [ ] Create login flow
-- [ ] Implement email validation
-- [ ] Add password requirements
-- [ ] Build forgot password flow
-- [ ] Set up TestFlight deployment pipeline
-
----
-
-## Phase 7: Polish & Refinements
-
-- [ ] Add animations and transitions
-- [ ] Implement accessibility features
-- [ ] Add haptic feedback
-- [ ] Error handling and retry logic
-- [ ] Empty states and loading indicators
-- [ ] Dark mode support (if not already)
-
----
-
-## Phase 8: Backend Integration
+## Phase 10: Backend Integration
 
 - [ ] Integrate Supabase Swift SDK
 - [ ] Implement authentication with Supabase Auth
@@ -112,8 +118,10 @@
 
 ---
 
-## Phase 9: App Store Preparation
+## Phase 11: App Store Preparation
 
+- [ ] Code signing setup
+- [ ] Set up TestFlight deployment pipeline
 - [ ] App Store screenshots
 - [ ] App Store description and metadata
 - [ ] Privacy policy
@@ -123,4 +131,3 @@
 - [ ] App Store submission
 
 ---
-
