@@ -33,16 +33,8 @@
 		2D3729532ECB95640092C153 /* Exceptions for "dotdot" folder in "dotdot" target */ = {
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
-				Core/Models/.gitkeep,
-				Core/Shared/.gitkeep,
-				Features/AddEntry/.gitkeep,
 				Features/Auth/.gitkeep,
-				Features/Dashboard/.gitkeep,
-				Features/EditEntry/.gitkeep,
-				Features/EntryDetail/.gitkeep,
-				Features/Search/.gitkeep,
 				Resources/.gitkeep,
-				Services/.gitkeep,
 				Utilities/.gitkeep,
 			);
 			target = 2D3729282ECB95610092C153 /* dotdot */;

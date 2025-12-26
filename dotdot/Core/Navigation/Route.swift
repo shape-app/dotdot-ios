@@ -2,12 +2,11 @@
 // Licensed under the MIT License
 
 import Foundation
-import SwiftData
 
 enum Route: Hashable {
     case dashboard
-    case entryDetail(Entry)
+    case entryDetail(UUID)
     case addEntry
-    case editEntry(Entry)
+    case editEntry(UUID)
     case search
 }

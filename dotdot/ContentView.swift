@@ -6,6 +6,11 @@ import SwiftUI
 
 struct ContentView: View {
     @StateObject private var router = Router()
+    @Environment(\.modelContext) private var modelContext
+
+    private var entryRepository: EntryRepository {
+        SwiftDataEntryRepository(modelContext: modelContext)
+    }
 
     var body: some View {
         NavigationStack(path: $router.path) {
@@ -22,12 +27,22 @@ struct ContentView: View {
         switch route {
         case .dashboard:
             DashboardView()
-        case .entryDetail(let entry):
-            EntryDetailView(entry: entry)
+        case .entryDetail(let entryID):
+            if let entry = entryRepository.fetchEntry(by: entryID) {
+                EntryDetailView(entry: entry)
+            } else {
+                Text("Entry not found")
+                    .foregroundColor(.textSecondary)
+            }
         case .addEntry:
             AddEntryView()
-        case .editEntry(let entry):
-            EditEntryView(entry: entry)
+        case .editEntry(let entryID):
+            if let entry = entryRepository.fetchEntry(by: entryID) {
+                EditEntryView(entry: entry)
+            } else {
+                Text("Entry not found")
+                    .foregroundColor(.textSecondary)
+            }
         case .search:
             SearchView()
         }
@@ -36,4 +51,5 @@ struct ContentView: View {
 
 #Preview {
     ContentView()
+        .modelContainer(for: Entry.self, inMemory: true)
 }

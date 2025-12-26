@@ -251,7 +251,6 @@ Reusable UI elements needed:
 - [x] Build configurations (Debug/Release)
 - [x] CI pipeline (lint, build, test)
 - [ ] Branch protection rules
-- [ ] Code signing setup (deferred to Phase 6-9 when deployment needed)
 
 ### Phase 2: Core Architecture & Design System
 **Duration:** Week 1-2
@@ -270,6 +269,16 @@ Reusable UI elements needed:
 - Set up NavigationStack
 - Create routing structure
 - Define screen flow
+
+**Phase 2.4:** Architecture Design (Offline-First + Backend Sync)
+- Design offline-first architecture pattern
+- Define Service Layer responsibilities
+- Design Repository + API Client interaction
+- Design sync queue strategy
+- Define conflict resolution approach
+- Document data flow (SwiftData ↔ Backend)
+- Get team approval on architecture design
+- Create architecture documentation
 
 ### Phase 3: Dashboard & List Views
 **Duration:** Week 2-3
@@ -302,6 +311,7 @@ Reusable UI elements needed:
 ### Phase 6: Landing & Authentication
 **Duration:** Week 5-6
 
+- Code signing setup (for TestFlight/device testing)
 - Build landing/onboarding screens
 - Create sign up flow
 - Create login flow
