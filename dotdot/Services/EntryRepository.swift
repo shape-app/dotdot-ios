@@ -23,4 +23,3 @@ class SwiftDataEntryRepository: EntryRepository {
         return try? modelContext.fetch(descriptor).first
     }
 }
-
