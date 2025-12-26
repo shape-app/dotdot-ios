@@ -27,6 +27,16 @@ else
 fi
 echo ""
 
+# Install git hooks
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+HOOKS_DIR="$(git rev-parse --git-dir)/hooks"
+
+if [ -f "$SCRIPT_DIR/pre-commit" ]; then
+    ln -sf "$SCRIPT_DIR/pre-commit" "$HOOKS_DIR/pre-commit"
+    echo "[OK] Pre-commit hook installed"
+fi
+echo ""
+
 echo "[OK] Setup complete!"
 echo ""
 echo "Next steps:"
